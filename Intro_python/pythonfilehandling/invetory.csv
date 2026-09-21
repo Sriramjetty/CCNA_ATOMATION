@@ -1,0 +1,8 @@
+hostname,ipadd,username,pasword,version
+rtr-edge=0,198.125.32.1,ciso,cisio-1,cisi_updtar
+rtr-edge=1,198.125.32.2,ciso,cisio-2,cisi_updtar
+rtr-edge=2,198.125.32.3,ciso,cisio-3,cisi_updtar
+spin-sw0,198.2253.62,ciso,cisio-4,cisi_updtar
+spin-sw1,51662.265.55,ciso,cisio-5,cisi_updtar
+spin-sw2,155.165,ciso,cisio-6,cisi_updtar
+spin-sw3,155.645.55,ciso,cisio-7,cisi_updtar

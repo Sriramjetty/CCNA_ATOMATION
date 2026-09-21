@@ -1,0 +1,3 @@
+hostname,ip_add,platform,version,status
+R1,125.255.255.1,cisco,15.1,active
+R2,125.255.255.2,cisco,15.1,active
