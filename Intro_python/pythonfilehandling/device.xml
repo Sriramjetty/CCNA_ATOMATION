@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<device>
+    <hostname>Router-Core-01</hostname>
+    <model>Cisco-ISR4331</model>
+    
+    <primaryIpv4Address>192.168.1.1</primaryIpv4Address>
+    <macAddress>00:11:22:33:44:55</macAddress>
+    <interfaces>
+        <interface>
+            <name>GigabitEthernet0/0/1</name>
+            <status>up</status>
+            <ipAddress>192.168.1.254</ipAddress>
+            <subnetMask>255.255.255.0</subnetMask>
+        </interface>
+        <interface>
+            <name>GigabitEthernet0/0/2</name>
+            <status>up</status>
+            <ipAddress>192.168.1.252</ipAddress>
+            <subnetMask>255.255.255.0</subnetMask>
+        </interface>
+    </interfaces>
+</device>
