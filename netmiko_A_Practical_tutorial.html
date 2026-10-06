@@ -1,0 +1,324 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Netmiko: A Practical Tutorial</title>
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<style>
+:root{
+  --bg:#0d1117; --panel:#111820; --panel-2:#0b1017; --border:#1f2933;
+  --text:#c9d3dc; --text-dim:#7c8b99; --heading:#eef2f5;
+  --accent:#7ee787; --accent-2:#e3b341; --code-bg:#0a0e13;
+  box-sizing:border-box;
+  padding-top:env(safe-area-inset-top,0px); padding-bottom:env(safe-area-inset-bottom,0px);
+}
+@media (prefers-color-scheme: light){
+  :root:not([data-theme="dark"]){
+    --bg:#f7f7f5; --panel:#ffffff; --panel-2:#f0efec; --border:#e2e0da;
+    --text:#33342f; --text-dim:#767468; --heading:#1c1c18;
+    --accent:#1f7a4d; --accent-2:#a5690f; --code-bg:#101418;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#0d1117; --panel:#111820; --panel-2:#0b1017; --border:#1f2933;
+  --text:#c9d3dc; --text-dim:#7c8b99; --heading:#eef2f5;
+  --accent:#7ee787; --accent-2:#e3b341; --code-bg:#0a0e13;
+}
+html{scroll-padding-top:calc(20px + env(safe-area-inset-top,0px));}
+*{box-sizing:border-box;}
+body{
+  margin:0; background:var(--bg); color:var(--text);
+  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Helvetica,Arial,sans-serif;
+  line-height:1.6;
+}
+code, pre, .mono{font-family:ui-monospace,SFMono-Regular,Consolas,"Liberation Mono",Menlo,monospace;}
+
+.layout{display:flex; max-width:1200px; margin:0 auto;}
+nav.sidebar{
+  width:260px; flex-shrink:0; position:sticky; top:0; height:100vh; overflow-y:auto;
+  border-right:1px solid var(--border); padding:28px 18px 40px;
+}
+nav.sidebar h1{font-size:16px; color:var(--heading); margin:0 0 2px;}
+nav.sidebar .tag{color:var(--text-dim); font-size:12.5px; margin-bottom:22px; display:block;}
+nav .level-label{font-size:11.5px; color:var(--accent); margin:22px 0 8px; letter-spacing:.02em;}
+nav .level-label:first-of-type{margin-top:0;}
+nav ul{list-style:none; padding:0; margin:0;}
+nav li a{
+  display:block; color:var(--text-dim); text-decoration:none; font-size:13.5px;
+  padding:6px 8px; border-radius:5px; border-left:2px solid transparent;
+}
+nav li a:hover{color:var(--text); background:var(--panel);}
+nav li a.active{color:var(--heading); border-left-color:var(--accent); background:var(--panel);}
+
+main{flex:1; min-width:0; padding:36px 44px 100px;}
+.intro{max-width:640px; margin-bottom:48px;}
+.intro h2{font-size:26px; color:var(--heading); margin:0 0 12px;}
+.intro p{color:var(--text-dim); font-size:15px;}
+
+.level-divider{
+  margin:52px 0 24px; padding-top:10px; border-top:1px solid var(--border);
+  display:flex; align-items:baseline; gap:10px;
+}
+.level-divider .num{color:var(--accent); font-size:13px;}
+.level-divider h3{font-size:13px; color:var(--text-dim); font-weight:600; margin:0; letter-spacing:.03em;}
+
+section.topic{
+  max-width:720px; margin-bottom:38px; padding-bottom:6px; scroll-margin-top:20px;
+}
+section.topic h4{font-size:18px; color:var(--heading); margin:0 0 10px;}
+section.topic p{margin:0 0 14px; font-size:14.5px; color:var(--text);}
+section.topic p.note{
+  color:var(--accent-2); font-size:13.5px; border-left:2px solid var(--accent-2);
+  padding-left:10px; margin:14px 0;
+}
+pre{
+  background:var(--code-bg); border:1px solid var(--border); border-radius:8px;
+  padding:14px 16px; overflow-x:auto; font-size:13px; margin:0;
+}
+pre code{color:#d7e0e8;}
+.kw{color:#ff9d7a;} .str{color:var(--accent);} .cm{color:var(--text-dim);} .fn{color:#7db9ff;}
+
+footer{max-width:720px; color:var(--text-dim); font-size:13px; padding-top:20px; border-top:1px solid var(--border);}
+
+@media (max-width:860px){
+  nav.sidebar{display:none;}
+  main{padding:24px 20px 80px;}
+}
+</style>
+</head>
+<body>
+<div class="layout">
+
+<nav class="sidebar" id="sidebar">
+  <h1>Netmiko</h1>
+  <span class="tag">a practical tutorial</span>
+
+  <div class="level-label">Level 1 · Fundamentals</div>
+  <ul>
+    <li><a href="#what-is-netmiko">What is Netmiko</a></li>
+    <li><a href="#installation">Installation</a></li>
+    <li><a href="#first-connection">Your first connection</a></li>
+  </ul>
+
+  <div class="level-label">Level 2 · Core operations</div>
+  <ul>
+    <li><a href="#sending-commands">Sending commands</a></li>
+    <li><a href="#config-changes">Configuration changes</a></li>
+    <li><a href="#device-types">Device types</a></li>
+    <li><a href="#enable-mode">Enable mode &amp; secrets</a></li>
+  </ul>
+
+  <div class="level-label">Level 3 · Practical patterns</div>
+  <ul>
+    <li><a href="#error-handling">Error handling</a></li>
+    <li><a href="#multiple-devices">Multiple devices</a></li>
+    <li><a href="#structured-output">Structured output</a></li>
+    <li><a href="#inventory-files">Reading from a file</a></li>
+  </ul>
+
+  <div class="level-label">Level 4 · Advanced</div>
+  <ul>
+    <li><a href="#timeouts">Timeouts &amp; delays</a></li>
+    <li><a href="#ssh-keys">SSH key auth</a></li>
+    <li><a href="#concurrency">Concurrent connections</a></li>
+    <li><a href="#logging">Session logging</a></li>
+    <li><a href="#best-practices">Best practices</a></li>
+  </ul>
+</nav>
+
+<main>
+  <div class="intro">
+    <h2>Netmiko, from first login to production scripts</h2>
+    <p>Netmiko is a Python library that simplifies SSH (and Telnet) connections to network devices — routers, switches, firewalls — so you can automate things you'd otherwise type by hand into a CLI. Each section below has a short explanation and a minimal, runnable example. Work through them in order, or jump to what you need from the sidebar.</p>
+  </div>
+
+  <div class="level-divider"><span class="num">01</span><h3>FUNDAMENTALS</h3></div>
+
+  <section class="topic" id="what-is-netmiko">
+    <h4>What is Netmiko</h4>
+    <p>Network devices don't expose clean APIs the way web servers do — most are still managed over an interactive SSH terminal. Netmiko wraps that terminal in Python: it handles the login prompt, disables paging, and gives you plain functions like <code>send_command()</code> instead of raw byte streams.</p>
+    <p>It supports 100+ platforms — Cisco IOS, NX-OS, ASA, Juniper, Arista, HP, and more — behind one consistent interface.</p>
+  </section>
+
+  <section class="topic" id="installation">
+    <h4>Installation</h4>
+    <p>Netmiko is a normal pip package. A virtual environment is recommended so it doesn't mix with system Python packages.</p>
+    <pre><code><span class="cm"># in a terminal</span>
+pip install netmiko</code></pre>
+  </section>
+
+  <section class="topic" id="first-connection">
+    <h4>Your first connection</h4>
+    <p>Every session starts the same way: describe the device in a dictionary, hand it to <code>ConnectHandler</code>, and you get back a live connection object.</p>
+    <pre><code><span class="kw">from</span> netmiko <span class="kw">import</span> ConnectHandler
+
+device = {
+    <span class="str">"device_type"</span>: <span class="str">"cisco_ios"</span>,
+    <span class="str">"host"</span>:        <span class="str">"198.18.128.10"</span>,
+    <span class="str">"username"</span>:    <span class="str">"admin"</span>,
+    <span class="str">"password"</span>:    <span class="str">"admin123"</span>,
+}
+
+connection = ConnectHandler(**device)
+<span class="fn">print</span>(connection.find_prompt())   <span class="cm"># e.g. "Router1#"</span>
+connection.disconnect()</code></pre>
+    <p class="note">Always call <code>disconnect()</code> when you're done — or better, use a <code>with</code> block, shown further down, so it closes automatically.</p>
+  </section>
+
+  <div class="level-divider"><span class="num">02</span><h3>CORE OPERATIONS</h3></div>
+
+  <section class="topic" id="sending-commands">
+    <h4>Sending commands</h4>
+    <p><code>send_command()</code> runs a single "show"-style command and waits for the prompt to return, giving you the full output as a string.</p>
+    <pre><code><span class="kw">with</span> ConnectHandler(**device) <span class="kw">as</span> conn:
+    output = conn.send_command(<span class="str">"show ip interface brief"</span>)
+    <span class="fn">print</span>(output)</code></pre>
+  </section>
+
+  <section class="topic" id="config-changes">
+    <h4>Configuration changes</h4>
+    <p>Configuration commands are different from show commands — they need config mode, entered one line at a time. <code>send_config_set()</code> handles that for you and saves the result of the whole block.</p>
+    <pre><code>config_commands = [
+    <span class="str">"interface loopback 10"</span>,
+    <span class="str">"description Configured by Netmiko"</span>,
+    <span class="str">"ip address 10.10.10.1 255.255.255.0"</span>,
+]
+
+<span class="kw">with</span> ConnectHandler(**device) <span class="kw">as</span> conn:
+    output = conn.send_config_set(config_commands)
+    conn.save_config()  <span class="cm"># "write memory" on IOS</span>
+    <span class="fn">print</span>(output)</code></pre>
+  </section>
+
+  <section class="topic" id="device-types">
+    <h4>Device types</h4>
+    <p><code>device_type</code> tells Netmiko which prompt patterns and quirks to expect. Common values: <code>cisco_ios</code>, <code>cisco_nxos</code>, <code>cisco_asa</code>, <code>juniper_junos</code>, <code>arista_eos</code>, <code>hp_comware</code>. If you don't know it in advance, <code>"autodetect"</code> can guess it for you.</p>
+    <pre><code><span class="kw">from</span> netmiko <span class="kw">import</span> SSHDetect
+
+guesser = SSHDetect(**{**device, <span class="str">"device_type"</span>: <span class="str">"autodetect"</span>})
+best_match = guesser.autodetect()
+<span class="fn">print</span>(best_match)  <span class="cm"># e.g. "cisco_ios"</span></code></pre>
+  </section>
+
+  <section class="topic" id="enable-mode">
+    <h4>Enable mode &amp; secrets</h4>
+    <p>Some platforms need a separate privileged ("enable") mode before you can configure anything. Add a <code>secret</code> to the device dictionary and call <code>enable()</code>.</p>
+    <pre><code>device[<span class="str">"secret"</span>] = <span class="str">"enable_password"</span>
+
+<span class="kw">with</span> ConnectHandler(**device) <span class="kw">as</span> conn:
+    conn.enable()
+    <span class="fn">print</span>(conn.find_prompt())  <span class="cm"># now ends in "#" not ">"</span></code></pre>
+  </section>
+
+  <div class="level-divider"><span class="num">03</span><h3>PRACTICAL PATTERNS</h3></div>
+
+  <section class="topic" id="error-handling">
+    <h4>Error handling</h4>
+    <p>Two exceptions cover most real-world failures: a timeout during login, and bad credentials. Catching them lets a script keep going instead of crashing on one unreachable device.</p>
+    <pre><code><span class="kw">from</span> netmiko.exceptions <span class="kw">import</span> NetmikoTimeoutException, NetmikoAuthenticationException
+
+<span class="kw">try</span>:
+    conn = ConnectHandler(**device)
+<span class="kw">except</span> NetmikoTimeoutException:
+    <span class="fn">print</span>(<span class="str">"Device unreachable"</span>)
+<span class="kw">except</span> NetmikoAuthenticationException:
+    <span class="fn">print</span>(<span class="str">"Bad username or password"</span>)</code></pre>
+  </section>
+
+  <section class="topic" id="multiple-devices">
+    <h4>Multiple devices</h4>
+    <p>A list of device dictionaries plus a loop is enough to run the same command across a whole fleet, one connection at a time.</p>
+    <pre><code>devices = [device1, device2, device3]
+
+<span class="kw">for</span> dev <span class="kw">in</span> devices:
+    <span class="kw">with</span> ConnectHandler(**dev) <span class="kw">as</span> conn:
+        <span class="fn">print</span>(dev[<span class="str">"host"</span>], <span class="str">"->"</span>, conn.send_command(<span class="str">"show version"</span>))</code></pre>
+  </section>
+
+  <section class="topic" id="structured-output">
+    <h4>Structured output</h4>
+    <p>Raw CLI text is painful to parse. Passing <code>use_textfsm=True</code> runs the output through TextFSM templates and returns a list of dictionaries instead of a wall of text.</p>
+    <pre><code>result = conn.send_command(<span class="str">"show ip interface brief"</span>, use_textfsm=<span class="kw">True</span>)
+<span class="fn">print</span>(result[0][<span class="str">"intf"</span>], result[0][<span class="str">"status"</span>])</code></pre>
+    <p class="note">Requires the <code>ntc-templates</code> package (installed alongside Netmiko's extras) for the matching template to exist.</p>
+  </section>
+
+  <section class="topic" id="inventory-files">
+    <h4>Reading from a file</h4>
+    <p>In practice, device lists live in a CSV or YAML file, not hard-coded in the script.</p>
+    <pre><code><span class="kw">import</span> csv
+
+<span class="kw">with</span> <span class="fn">open</span>(<span class="str">"devices.csv"</span>) <span class="kw">as</span> f:
+    <span class="kw">for</span> row <span class="kw">in</span> csv.DictReader(f):
+        <span class="kw">with</span> ConnectHandler(**row) <span class="kw">as</span> conn:
+            <span class="fn">print</span>(conn.send_command(<span class="str">"show clock"</span>))</code></pre>
+  </section>
+
+  <div class="level-divider"><span class="num">04</span><h3>ADVANCED</h3></div>
+
+  <section class="topic" id="timeouts">
+    <h4>Timeouts &amp; delays</h4>
+    <p>Slower devices or heavy commands sometimes need more patience than the defaults allow. <code>read_timeout</code> extends how long a single command waits; <code>global_delay_factor</code> scales every internal wait in the session.</p>
+    <pre><code>conn.send_command(<span class="str">"show tech-support"</span>, read_timeout=120)
+
+device[<span class="str">"global_delay_factor"</span>] = 2  <span class="cm"># slow device, double all delays</span></code></pre>
+  </section>
+
+  <section class="topic" id="ssh-keys">
+    <h4>SSH key authentication</h4>
+    <p>Password can be swapped for a private key file — useful for devices set up with key-based auth instead of passwords.</p>
+    <pre><code>device = {
+    <span class="str">"device_type"</span>: <span class="str">"cisco_ios"</span>,
+    <span class="str">"host"</span>:        <span class="str">"198.18.128.10"</span>,
+    <span class="str">"username"</span>:    <span class="str">"admin"</span>,
+    <span class="str">"use_keys"</span>:    <span class="kw">True</span>,
+    <span class="str">"key_file"</span>:    <span class="str">"/home/user/.ssh/id_rsa"</span>,
+}</code></pre>
+  </section>
+
+  <section class="topic" id="concurrency">
+    <h4>Concurrent connections</h4>
+    <p>Looping through devices one by one is slow at scale. A thread pool lets Netmiko talk to many devices in parallel, since each connection just waits on network I/O most of the time.</p>
+    <pre><code><span class="kw">from</span> concurrent.futures <span class="kw">import</span> ThreadPoolExecutor
+
+<span class="kw">def</span> <span class="fn">get_version</span>(dev):
+    <span class="kw">with</span> ConnectHandler(**dev) <span class="kw">as</span> conn:
+        <span class="kw">return</span> dev[<span class="str">"host"</span>], conn.send_command(<span class="str">"show version"</span>)
+
+<span class="kw">with</span> ThreadPoolExecutor(max_workers=10) <span class="kw">as</span> pool:
+    results = <span class="fn">list</span>(pool.map(get_version, devices))</code></pre>
+  </section>
+
+  <section class="topic" id="logging">
+    <h4>Session logging</h4>
+    <p>When something misbehaves, a raw session log of every byte sent and received is the fastest way to see what actually happened on the wire.</p>
+    <pre><code>device[<span class="str">"session_log"</span>] = <span class="str">"netmiko_session.log"</span></code></pre>
+  </section>
+
+  <section class="topic" id="best-practices">
+    <h4>Best practices</h4>
+    <p>A short checklist for production scripts:</p>
+    <p>— Use <code>with ConnectHandler(...)</code> so connections always close, even on error.<br>
+       — Keep credentials out of source code (environment variables or a secrets manager).<br>
+       — Wrap connections in try/except so one bad device doesn't stop the whole run.<br>
+       — Prefer <code>send_config_set()</code> over sending raw config lines with <code>send_command()</code>.<br>
+       — Use threading only after single-device logic is solid and tested.</p>
+  </section>
+
+  <footer>Netmiko is open source and documented at github.com/ktbyers/netmiko — this page covers the parts you'll use day to day, not the full API surface.</footer>
+</main>
+</div>
+
+<script>
+const links = document.querySelectorAll('nav a');
+const sections = document.querySelectorAll('section.topic');
+const setActive = () => {
+  let current = sections[0]?.id;
+  for (const s of sections) if (window.scrollY + 40 >= s.offsetTop) current = s.id;
+  links.forEach(a => a.classList.toggle('active', a.getAttribute('href') === '#' + current));
+};
+window.addEventListener('scroll', setActive, {passive:true});
+setActive();
+</script>
+</body>
+</html>
