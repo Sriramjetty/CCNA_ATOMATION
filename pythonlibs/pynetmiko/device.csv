@@ -1,0 +1,4 @@
+host,device_type,username,password
+198.18.134.20,cisco_ios,cisco,cisco
+198.18.134.21,cisco_ios,cisco,cisco
+198.18.134.22,cisco_ios,cisco,cisco
