@@ -1,0 +1,4 @@
+host,device_type,pod_id
+198.18.134.20,cisco_ios,20
+198.18.134.21,cisco_ios,21
+198.18.134.22,cisco_ios,22
